@@ -44,4 +44,3 @@ def conv2d(x, nb_filters, filter_size, padding, name, bn=False):
         x = BatchNormalization()(x)
     x = Activation('relu')(x)
     return x
-
