@@ -139,7 +139,7 @@ def eval_imageOBX(gt, pred, acc1, acc2, acc3, acc4, acc5, cal_classes = 3): #, n
 def pred_imageOBX(filename, label_filename, model, patch_size, stride_size):
 
     # croppping an image into patches for prediction
-    X, _ = img2patchOBX(filename, label_filename, patch_size, stride_size, True, False)
+    X, _ = img2patchOBX(filename, label_filename, patch_size, stride_size, 3) #True, False)
     pred_patches = model.predict(X)
 
     # rearranging patchess into an image
@@ -171,7 +171,7 @@ def pred_imageOBX(filename, label_filename, model, patch_size, stride_size):
 
     return im_out/im_index
 
-def TestModelOBX(model, output_folder='model', patch_size=256, stride_size=128, nb_classes = 3):#, noclutter=True):
+def TestModelOBX(test_set,model, output_folder='model', patch_size=256, stride_size=128, nb_classes = 3):#, noclutter=True):
 
     # path for saving output
     output_path = folder_path + 'outputs/' + output_folder + '/'

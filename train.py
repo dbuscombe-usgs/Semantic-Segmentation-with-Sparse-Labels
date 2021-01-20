@@ -3,7 +3,7 @@ import os
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 #
-
+import matplotlib.pyplot as plt
 from fcn import *
 from utils import *
 from loss import *
@@ -20,18 +20,19 @@ an_id = 1 # id of annotators: 1 and 2 are expert, 3 and 4 are non-expert
 batch_size = 2 # size of training batch
 epochs = 20 #100 # number of training epochs
 lr = 2e-4 # initial learning rate
-lambda_festa = 0.1 # 0.1 # lambda in Eq. 2, weight of festa
+lambda_festa = 0.01 # 0.1 # lambda in Eq. 2, weight of festa
 
 VAL_SPLIT = 0.5 # 0.05
 
 nb_classes = 3
 
 min_lr=0.5e-10
-patience=0
+patience=5
+patience_lr=0
 factor=0.1
 
 trainval_set = np.arange(20).tolist()
-test_set = np.arange(20,40).tolist() #165
+test_set = np.arange(20,165).tolist() #165
 
 # **************************** path ********************************
 weight_path = 'weights/fcn-obx_patch'+str(patch_size)+'_stride'+str(stride_size)+'_batch'+str(batch_size)+'_lambda'+str(lambda_festa)+'.h5'
@@ -57,7 +58,7 @@ model.compile(optimizer=optimizer, loss=loss, loss_weights=loss_weights, metrics
 print('model is built')
 
 # ********************* train ***********************************
-lr_reducer = ReduceLROnPlateau(monitor='val_loss', factor=factor, cooldown=0, patience=patience, min_lr=min_lr)
+lr_reducer = ReduceLROnPlateau(monitor='val_loss', factor=factor, cooldown=0, patience=patience_lr, min_lr=min_lr)
 
 earlystop = EarlyStopping(monitor="val_loss", mode="min", patience=patience)
 
@@ -107,4 +108,4 @@ model = fcn_festa(patch_size, True, nb_classes)#, noclutter)
 model.load_weights(weight_path, by_name=True)
 
 # ********************* evaluate ****************************
-TestModelOBX(model, out_folder, patch_size, stride_size, nb_classes) #, noclutter)
+TestModelOBX(test_set,model, out_folder, patch_size, stride_size, nb_classes) #, noclutter)
