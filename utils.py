@@ -4,7 +4,7 @@ import os
 import scipy.io as sio
 from sklearn.metrics import confusion_matrix
 from glob import glob
-
+import matplotlib.pyplot as plt
 import tensorflow.compat.v1 as tf
 
 
@@ -136,15 +136,15 @@ def eval_imageOBX(gt, pred, acc1, acc2, acc3, acc4, acc5, cal_classes = 3): #, n
     return acc1, acc2, acc3, acc4, acc5
 
 
-def pred_imageOBX(filename, label_filename, model, patch_size, stride_size):
+def pred_imageOBX(image_filename, label_filename, model, patch_size, stride_size, nb_classes = 3):
 
     # croppping an image into patches for prediction
-    X, _ = img2patchOBX(filename, label_filename, patch_size, stride_size, 3) #True, False)
+    X, _ = img2patchOBX(image_filename, label_filename, patch_size, stride_size, nb_classes) #True, False)
     pred_patches = model.predict(X)
 
     # rearranging patchess into an image
     # For pixels with multiple predictions, we take their averages
-    im_row, im_col, _ = np.shape(cv2.imread(filename))
+    im_row, im_col, _ = np.shape(cv2.imread(image_filename))
     steps_col = int(np.floor((im_col - (patch_size - stride_size)) / stride_size))
     steps_row = int(np.floor((im_row - (patch_size - stride_size)) / stride_size))
     im_out = np.zeros((im_row, im_col, np.shape(pred_patches)[-1]))
@@ -171,13 +171,13 @@ def pred_imageOBX(filename, label_filename, model, patch_size, stride_size):
 
     return im_out/im_index
 
-def TestModelOBX(test_set,model, output_folder='model', patch_size=256, stride_size=128, nb_classes = 3):#, noclutter=True):
+def TestModelOBX(test_set,model, out_folder='model', patch_size=256, stride_size=128, nb_classes = 3):#, noclutter=True):
 
     # path for saving output
-    output_path = folder_path + 'outputs/' + output_folder + '/'
-    if not os.path.isdir(output_path):
+    #output_path = folder_path + 'outputs/' + output_folder + '/'
+    if not os.path.isdir(out_folder): #output_path):
         print('The target folder is created.')
-        os.mkdir(output_path)
+        os.mkdir(out_folder) #output_path)
 
     #nb_classes = 3 #1 if noclutter else 2
 
@@ -207,14 +207,19 @@ def TestModelOBX(test_set,model, output_folder='model', patch_size=256, stride_s
         gt = tf.cast(label, tf.uint8).numpy().squeeze()
 
         # predict one image
-        pred = pred_imageOBX(image_filename, label_filename, model, patch_size, stride_size)
+        pred = pred_imageOBX(image_filename, label_filename, model, patch_size, stride_size, nb_classes)
         pred = np.argmax(pred, -1)
         #gt = np.argmax(gt, -1)
 
+        plt.subplot(122); plt.imshow(pred, cmap='bwr', vmin=0, vmax=2); plt.title('Pred');  plt.axis('off')
+        plt.subplot(121); plt.imshow(gt, cmap='bwr', vmin=0, vmax=2); plt.title('GT'); plt.axis('off')
+        #plt.show()
+        plt.savefig(out_folder+os.sep+image_filename.split(os.sep)[-1].replace('img/','outputs/'), dpi=300, bbox_inches='tight')
+        plt.close()
+
         # evaluate one image
         acc1, acc2, acc3, acc4, acc5 = eval_imageOBX(gt, pred, acc1, acc2, acc3, acc4, acc5, nb_classes) #, noclutter)
-        cv2.imwrite(image_filename.replace('img/','outputs/'), pred) #index2bgr(pred, True))
-        print('Prediction is done. The output is saved in ', output_path)
+        #cv2.imwrite(image_filename.replace('img/','outputs/'), pred) #index2bgr(pred, True))
 
     #
     # # predicting and measuring all images

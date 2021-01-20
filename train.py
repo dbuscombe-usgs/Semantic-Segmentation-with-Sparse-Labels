@@ -20,9 +20,9 @@ an_id = 1 # id of annotators: 1 and 2 are expert, 3 and 4 are non-expert
 batch_size = 2 # size of training batch
 epochs = 20 #100 # number of training epochs
 lr = 2e-4 # initial learning rate
-lambda_festa = 0.01 # 0.1 # lambda in Eq. 2, weight of festa
+lambda_festa = 0.1 #0.5 #0.1 # lambda in Eq. 2, weight of festa
 
-VAL_SPLIT = 0.5 # 0.05
+VAL_SPLIT = 0.25 # 0.05
 
 nb_classes = 3
 
@@ -31,14 +31,23 @@ patience=5
 patience_lr=0
 factor=0.1
 
+alpha = 0.5 # weight of neighbour in the feature space
+beta = 1.5 # weight of neighbour in the image space
+gamma = 1 # weight of far-away in the feature space
+sample_ratio = 0.1 #0.01 # measure only sample_ratio % samples for computational efficiency
+
+
 trainval_set = np.arange(20).tolist()
-test_set = np.arange(20,165).tolist() #165
+test_set = np.arange(20,40).tolist() #165
 
 # **************************** path ********************************
 weight_path = 'weights/fcn-obx_patch'+str(patch_size)+'_stride'+str(stride_size)+'_batch'+str(batch_size)+'_lambda'+str(lambda_festa)+'.h5'
 
 # **************************** losses ********************************
-loss = [L_festa, 'categorical_crossentropy'] # final loss Eq. 2
+# loss = [L_festa, 'categorical_crossentropy'] # final loss Eq. 2
+
+loss = [L_festa(alpha, beta, gamma, sample_ratio), 'categorical_crossentropy'] # final loss Eq. 2
+
 loss_weights = [lambda_festa, 1] # weight of each loss term in Eq. 2
 
 # ********************** loading data *****************************
@@ -72,10 +81,10 @@ plt.plot(history.history['loss'], 'k')
 plt.plot(history.history['val_loss'], 'r')
 plt.title('Categorical crossentropy loss')
 
-plt.subplot(232)
-plt.plot(history.history['final_feat_loss'], 'k')
-plt.plot(history.history['val_final_feat_loss'], 'r')
-plt.title('Feature loss')
+# plt.subplot(232)
+# plt.plot(history.history['final_feat_loss'], 'k')
+# plt.plot(history.history['val_final_feat_loss'], 'r')
+# plt.title('Feature loss')
 
 plt.subplot(233)
 plt.plot(history.history['final_out_loss'], 'k')
@@ -101,7 +110,8 @@ plt.title('Learning rate')
 plt.savefig(weight_path.replace('.h5','.png'), dpi=300, bbox_inches='tight')
 
 
-out_folder = 'festa'
+# out_folder = 'festa'
+out_folder = 'data/OBX/outputs/fcn-obx_patch'+str(patch_size)+'_stride'+str(stride_size)+'_batch'+str(batch_size)+'_lambda'+str(lambda_festa)
 
 # ********************* initialize model ********************
 model = fcn_festa(patch_size, True, nb_classes)#, noclutter)
