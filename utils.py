@@ -211,8 +211,8 @@ def TestModelOBX(test_set,model, out_folder='model', patch_size=256, stride_size
         pred = np.argmax(pred, -1)
         #gt = np.argmax(gt, -1)
 
-        plt.subplot(122); plt.imshow(pred, cmap='bwr', vmin=0, vmax=2); plt.title('Pred');  plt.axis('off')
-        plt.subplot(121); plt.imshow(gt, cmap='bwr', vmin=0, vmax=2); plt.title('GT'); plt.axis('off')
+        plt.subplot(122); plt.imshow(pred, cmap='bwr', vmin=0, vmax=2); plt.title('Pred', fontsize=7);  plt.axis('off')
+        plt.subplot(121); plt.imshow(gt, cmap='bwr', vmin=0, vmax=2); plt.title('GT', fontsize=7); plt.axis('off')
         #plt.show()
         plt.savefig(out_folder+os.sep+image_filename.split(os.sep)[-1].replace('img/','outputs/'), dpi=300, bbox_inches='tight')
         plt.close()

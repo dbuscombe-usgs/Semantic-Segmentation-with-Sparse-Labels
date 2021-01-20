@@ -8,11 +8,11 @@ def L_festa(alpha, beta, gamma, sample_ratio):
 
     def loss(_, y_pred):
 
-        alpha = 0.5 # weight of neighbour in the feature space
-        beta = 1.5 # weight of neighbour in the image space
-        gamma = 1 # weight of far-away in the feature space
-
-        sample_ratio = 0.1 #0.01 # measure only sample_ratio % samples for computational efficiency
+        # alpha = 0.5 # weight of neighbour in the feature space
+        # beta = 1.5 # weight of neighbour in the image space
+        # gamma = 1 # weight of far-away in the feature space
+        #
+        # sample_ratio = 0.1 #0.01 # measure only sample_ratio % samples for computational efficiency
 
         _, h, w, c = K.int_shape(y_pred)
         batch_size = K.shape(y_pred)[0]
